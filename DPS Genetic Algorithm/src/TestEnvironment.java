@@ -21,11 +21,16 @@ public class TestEnvironment {
 				{	13,	3,	7,	6	},
 			};
 
+        String[] labels = 
+        {   "Var1", "Var1", "Var1", "Var1"  };
+
 		Environment env = new Environment();
 		
 		env.getNewSample(data,0.5);
+        env.setLabels(labels);
 		
 		System.out.println(Arrays.deepToString(env.getDataSet()));
+		System.out.println(Arrays.toString(env.getNamedCol("Var1")));
 	}
 
 }

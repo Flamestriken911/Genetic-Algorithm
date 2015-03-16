@@ -5,7 +5,7 @@ public class TestReadCSV {
 
 	public static void main(String[] args) {
 		String file = 
-			"C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\sampledata.csv";
+			"C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm\\sampledata.csv";
 		boolean[] cols = {true, true, true};
 		boolean hasLabels = true;
 		

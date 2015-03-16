@@ -5,6 +5,8 @@ class Environment {
     //Initialize variables
         //Reference to dataset to draw upon 
     private double[][] dataSet;
+    private String[] labels;
+    private int keptRows;
     
 
     //Method to fill the environment with a new sample of some dataset
@@ -19,13 +21,13 @@ class Environment {
 	    	//Make array of booleans to decide which rows to keep
 	    	int dataRows = data.length;
 	    		//Track exact number of the remaining rows
-	    	int keptRows = 0;
+	    	this.keptRows = 0;
 	    	boolean[] keepList = new boolean[dataRows];
 	    	for (int i=0; i<dataRows; i++) {
 	    		keepList[i] = (false);
 	    		if(Math.random() < proportion) {
 	        		keepList[i] = (true);
-	        		keptRows++;
+	        		this.keptRows++;
 	    		}
 	    	}
 	    	//Put kept rows into the dataSet property
@@ -44,6 +46,37 @@ class Environment {
     //Method returning the 'dataSet' property
     public double[][] getDataSet() {
     	return this.dataSet;
+    }
+
+
+    //Method to get a column in a flat array
+    public double[] getColumn(int colNum){
+        double[] returnColumn = new double[this.keptRows];
+        for (int i=0; i<this.keptRows; i++){
+            returnColumn[i] = dataSet[i][colNum];
+        }
+        return returnColumn;
+    }
+    
+
+    //Find the column number for the variable named in the function argument
+    public int findColByName(String varName){
+        int i;
+    	for (i=0; i<labels.length; i++){
+            if(varName.equals(labels[i])) break;
+        }
+        return i;
+    }
+
+    //Method to get flat column for named variable
+    double[] getNamedCol(String colName){
+        return this.getColumn(this.findColByName(colName));
+    }
+
+
+    //Method to set the labels property of the environment
+    public void setLabels(String[] newLabels){
+        this.labels = newLabels;
     }
 }
 

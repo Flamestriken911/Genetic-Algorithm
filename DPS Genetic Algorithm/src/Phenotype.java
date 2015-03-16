@@ -1,5 +1,7 @@
 //Code for the 'phenotypes' of the evolutionary algorithm
 import java.util.Arrays;
+import org.apache.commons.math3.*;
+
 
 class Phenotype {
 
@@ -9,6 +11,8 @@ class Phenotype {
     private double mutationRate;
     private int mutationDepth;
     private boolean isMutant;
+    private int numVars;
+    private double[] varCoeffs;
 
 
 //Class constructor
@@ -29,6 +33,10 @@ class Phenotype {
             isMutant = false;
         }
 
+        this.numVars = 0;
+        for (boolean var : varSelection){
+            if(var) this.numVars++;
+        }
     }
 
     
@@ -38,6 +46,7 @@ class Phenotype {
         Phenotype child = new Phenotype(varSelection, mutationRate, mutationDepth, true);
         return child;
     }
+
 
 
     //Code for mutate method
@@ -100,5 +109,10 @@ class Phenotype {
         //Mutant indicator
     public void setIsMutant(boolean newIsMutant) {
         isMutant = newIsMutant;
+    }
+
+
+    public void train(Environment env){
+
     }
 }
