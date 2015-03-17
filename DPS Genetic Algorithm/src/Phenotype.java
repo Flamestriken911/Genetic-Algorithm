@@ -120,7 +120,9 @@ class Phenotype {
     }
 
     public double score(double[][] X, double[] Y){
-        
+        this.reg.newXSampleData(X);
+        this.reg.newYSampleData(Y);
+        double adjR2 = reg.calculateAdjustedRSquared();
     }
 
 }

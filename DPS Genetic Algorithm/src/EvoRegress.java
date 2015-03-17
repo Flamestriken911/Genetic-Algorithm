@@ -34,8 +34,10 @@ class EvoRegress {
 
             //Control variables for main while function
         boolean converged = false;
-        int maxIter = 2;
-        int iter = 0;
+        int generation = 0;
+        int maxGeneration = 2;
+        double trainingProportion = 0.2;
+        double battleProportion = 0.1;
 
             //Read in the data from the CSV
         ReadCSV reader = new ReadCSV();
@@ -66,18 +68,64 @@ class EvoRegress {
 
         //Start the genetic algorithm
             //Run until convergence or max iterations
-        while (!converged && iter < maxIter) {
+        while (!converged && generation < maxGeneration) {
 
             //Create training environment
                 //We start with a sample proportion of 0.2
             Environment trainEnv = new Environment();
-            trainEnv.getNewSample(reader.getData(),.2)
+            trainEnv.getNewSample(reader.getData(), trainingProportion);
+
+
+
+/* Requires a few inputs that I can't currently provide for training phenotypes (X and Y for their varBools)*/
+
 
             //Train the phenotypes on this environment
-            train(/*args*/);
+            for (Phenotype gene : genePool){
+                gene.train(trainEnv.X, trainEnv.Y);
+            }
+
 
             //Match up phenotypes for 'battle' and put them in a training environment
-            matchup( /*list of un-fought phenotypes*/, /*Battle Environment*/);
+                //Note that boolean arrays initialize to all false values
+            boolean[] hasFought = new boolean[numPhenotypes];
+            int notFought = numPhenotypes;
+            for (int fighter=0; i<numPhenotypes; i++){
+                if (!hasFought[fighter]){
+                    hasFought[fighter] = true;
+                    Environment battleGround = new Environment();
+                    battleGround.getNewSample(reader.getData(), battleProportion);
+                        //Generate # for which remaining unfought gene battles current gene
+                    int fightNth  = (Math.random() * notFought) -1;
+                    int vsIndex = 0;
+                    int numPassed = 0;
+                        //Find the gene to fight
+                    while(numPassed<fightNth){
+                        if (!hasFought[vsIndex]){
+                            numPassed++;
+                            if (numPassed == fightNth){
+                                break;
+                            }
+                        }
+                        vsIndex++;
+                    }
+                    hasFought[vsIndex] = true;
+
+                        //Fighter fights vs gene at vsIndex unless they have same id
+                    if (    !(genePool[fighter].id == genePool[fighter].id) ){
+                        if (
+                                genePool[fighter].score(battleGround.X, battleGround.Y) 
+                                > 
+                                genePool[vsIndex].score(battleGround.X, battleGround.Y))
+                        {
+                            genePool[vsIndex] = genePool[fighter].reproduce();
+                        } else{
+                            genePool[fighter] = genePool[vsIndex].reproduce();
+                        }
+                    }
+                }
+            }
+            generation++;
         }
 
 

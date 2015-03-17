@@ -13,6 +13,7 @@ class Phenotype {
     private boolean isMutant;
     private int numVars;
     private double[] varCoeffs;
+    private OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
 
 
 //Class constructor
@@ -113,9 +114,17 @@ class Phenotype {
 
 
     public void train(double[][] X, double[] Y){
-        OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
-        reg.newXSampleData(X);
-        reg.newYSampleData(Y);
+        this.reg.newXSampleData(X);
+        this.reg.newYSampleData(Y);
         this.varCoeffs = reg.estimateRegressionParameters();
     }
+
+    public double score(double[][] X, double[] Y){
+        this.reg.newXSampleData(X);
+        this.reg.newYSampleData(Y);
+        double adjR2 = reg.calculateAdjustedRSquared;
+    }
+
 }
+
+
