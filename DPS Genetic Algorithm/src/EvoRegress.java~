@@ -11,6 +11,10 @@ class EvoRegress {
 
         //Initialize variables
 
+            //Name of the dependent variable
+                //'Objective' is just a placeholder
+        String depVar = "Objective";
+
             //Strings with path to dataset and output destination
 
 
@@ -74,6 +78,7 @@ class EvoRegress {
             trainEnv.getNewSample(reader.getData(),.2)
 
             //Train the phenotypes on this environment
+                //Note that only one member of each phenotype id must be trained
             train(/*args*/);
 
             //Match up phenotypes for 'battle' and put them in a training environment
