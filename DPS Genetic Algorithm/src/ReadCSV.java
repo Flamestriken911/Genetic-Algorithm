@@ -16,26 +16,20 @@ public class ReadCSV {
 	
 	
 	
-  //Use boolean array to determine variables to keep, and a float in (0,1] for option to keep only a proportion of rows
   //hasLabels indicates whether the first row of the CSV contains labels
-  public void readFile(String csvFile, int numRows, boolean[] colsToKeep, double rowChance, boolean hasLabels) {
+  public void readFile(String csvFile, int numRows, int numCols boolean hasLabels) {
  
 	BufferedReader br = null;
 	String line = "";
 	String cvsSplitBy = ",";
     //For now, assume all data will be type double
-    int rowNum = 0;
-    int numCols = 0;
-    for (boolean col : colsToKeep){
-    	if(col){
-    		numCols++;
-    	};
-    };
+    int currentRow = 0;
+
     this.data = new double[numRows][numCols];
     this.labels = new String[numCols];
 
     
-    //Attempt to read in each line with probability P=(rowChance)
+    //Attempt to read in each line
 	try {
  
 		br = new BufferedReader(new FileReader(csvFile));
@@ -45,15 +39,15 @@ public class ReadCSV {
 	        // Use comma as separator
 			String[] rowData = line.split(cvsSplitBy);
  
-            if (!hasLabels || rowNum >0) {
+            if (currentRow >0 || !hasLabels) {
                 //Access data via rowData[column#]
-                for (int colNum=0; colNum<rowData.length; colNum++) {
-                	this.data[rowNum][colNum] = Double.parseDouble(rowData[colNum]);
+                for (int currentCol=0; currentCol<rowData.length; currentCol++) {
+                	this.data[currentRow][currentCol] = Double.parseDouble(rowData[currentCol]);
                 }
             }
             else {
-                for (int colNum=0; colNum<rowData.length; colNum++) {
-                	this.labels[colNum] = rowData[colNum];
+                for (int currentCol=0; currentCol<rowData.length; currentCol++) {
+                	this.labels[currentCol] = rowData[currentCol];
                 }
             }
 
