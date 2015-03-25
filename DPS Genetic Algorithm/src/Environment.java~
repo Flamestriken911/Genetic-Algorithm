@@ -7,7 +7,8 @@ class Environment {
     private double[][] dataSet;
     private String[] labels;
     private int keptRows;
-    
+    private String objective;   
+    private double[] objData;
 
     //Method to fill the environment with a new sample of some dataset
     	//'proportion' is the approximate proportion of dataset to keep
@@ -64,8 +65,24 @@ class Environment {
 
 
     //Method to set the name of the objective variable
-    public set objectiveVar(String newObjVar){
+    public setObjVar(String newObjVar){
         this.objective = newObjVar;
+    }
+
+
+    //Method to separate out the objective var from the other variables
+    public separateObjVar(){
+        this.objData = this.getNamedCol(this.objective);
+        int objCol = this.findColByName(this.objective);
+            //New dataset will have one fewer column than original
+        double[][] otherData = new double[this.dataSet.length][this.dataSet[0].length-1];
+        for (int i=0; i<this.dataSet.length; i++){
+            int currentCol=0;
+            for (int j=0; j<this.dataSet[0].length; j++){
+                if(j!=objCol) otherData[i][j] = this.dataSet[i][currentCol];
+            }
+        }
+        this.dataSet = otherData;
     }
 
 
@@ -88,8 +105,9 @@ class Environment {
         return i;
     }
 
+
     //Method to get flat column for named variable
-    double[] getNamedCol(String colName){
+    public double[] getColByName(String colName){
         return this.getColumn(this.findColByName(colName));
     }
 
@@ -103,5 +121,3 @@ class Environment {
     }
     
 }
-
-

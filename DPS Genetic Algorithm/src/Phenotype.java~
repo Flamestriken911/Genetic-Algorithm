@@ -115,8 +115,6 @@ class Phenotype {
     //Train the phenotype on the provided environment
     public void train(Environment env){
         //Get the y[] and x[][] data from the environment
-        double[] Y = env.getObjData();
-        double[][] X = new double[][];
         this.reg.newSampleData(env.getObjData(), env.getDataSet());
         this.varCoeffs = this.reg.estimateRegressionParameters();
     }
