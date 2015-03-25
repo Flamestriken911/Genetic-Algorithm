@@ -1,6 +1,6 @@
 //Code for the 'phenotypes' of the evolutionary algorithm
 import java.util.Arrays;
-import org.apache.commons.math3.*;
+import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 
 class Phenotype {
@@ -120,7 +120,9 @@ class Phenotype {
     }
 
     public double score(double[][] X, double[] Y){
-        
+        this.reg.newXSampleData(X);
+        this.reg.newYSampleData(Y);
+        double adjR2 = reg.calculateAdjustedRSquared();
     }
 
 }

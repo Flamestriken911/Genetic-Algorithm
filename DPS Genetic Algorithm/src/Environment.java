@@ -13,8 +13,9 @@ class Environment {
     	//'proportion' is the approximate proportion of dataset to keep
     public void getNewSample(double[][] data, double proportion) {
        	//If the proportion is 1, then dataSet is the full array provided
-    	if (proportion==1){
+    	if (proportion==1.0){
     		this.dataSet = data;
+    		this.keptRows = data.length;
     	}
     	//If proportion <1, then only keep a random subset of that dataset
     	else {
@@ -74,10 +75,14 @@ class Environment {
     }
 
 
-    //Method to set the labels property of the environment
+    //Methods to set and get the labels property of the environment
     public void setLabels(String[] newLabels){
         this.labels = newLabels;
     }
+    public String[] getLabels(){
+        return this.labels;
+    }
+    
 }
 
 

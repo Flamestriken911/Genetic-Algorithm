@@ -1,0 +1,63 @@
+//This code gets the coefficients and r2 values for single-var regressions
+    //Repeated for each variable in data
+import java.util.Arrays;
+import org.apache.commons.math3.*;
+
+class SingleVarReg {
+
+String objectiveVar = "Obj";
+String dataFile     = 
+    "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampledata.csv";
+String outFile      = 
+    "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampleoutput.txt";
+int dataCols        = 7;
+int dataRows        = 4;
+double[][] XY;
+boolean hasLabels   = true;
+
+
+    public static void main(String[] args) {
+
+        //Read in the data from the CSV file and put it into an environment
+        ReadCSV data = new ReadCSV();
+        data.readFile(dataFile, dataRows, dataCols, hasLabels); 
+        Environment env = new Environment();
+            //Put entire dataset into environment
+        env.getNewSample(data.getData(), 1.0);
+            //Keep array of labels for the columns
+        env.setLabels = data.getLabels();
+
+            //Get the objective varaible as an array
+        double[] Y = env.getNamedCol(objectiveVar);
+        double[] X;
+
+            //Make a new regression instance
+        SimpleRegression reg = new SimpleRegression();
+
+            //Prepare to write output
+        File fout = new File(outFile);
+        FileOutputStream fos = new FileOutputStream(fout);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+     
+
+
+            //Loop through (non-objective) vars and regress on each
+        for  (String var : env.getLabels()){
+            reg.clear();
+            if(!objectiveVar.equals(var)){
+                X = env.getNamedCol(var);
+                XY = {X, Y};
+                reg.addData(XY);
+                RegressionResults results = reg.regress();
+                    //Write coeffs and r2 to file
+                bw.write(Arrays.toString(results.getParameterEstimates()) + ", " + results.getRSquared());
+                bw.newLine();
+            }
+        }
+        bw.close();
+    }
+
+
+
+
+}
