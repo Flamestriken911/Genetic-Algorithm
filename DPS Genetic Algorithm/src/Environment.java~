@@ -64,13 +64,9 @@ class Environment {
 
 
     //Method to set the name of the objective variable
-    public setObjVar(String newObjVar){
+    public set objectiveVar(String newObjVar){
         this.objective = newObjVar;
     }
-
-
-    //Method to separate out the objective var from the other variables
-    private 
 
 
     //Method to get a column in a flat array

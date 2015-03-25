@@ -72,7 +72,7 @@ class EvoRegress {
             //Create training environment
                 //We start with a sample proportion of 0.2
             Environment trainEnv = new Environment();
-            trainEnv.getNewSample(env.getDataSet(), trainingProportion);
+            trainEnv.getNewSample(reader.getData(), trainingProportion);
 
 
 
