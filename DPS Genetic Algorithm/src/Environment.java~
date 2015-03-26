@@ -4,11 +4,17 @@ class Environment {
 
     //Initialize variables
         //Reference to dataset to draw upon 
-    private double[][] dataSet;
+    public double[][] dataSet;
     private String[] labels;
     private int keptRows;
     private String objective;   
     private double[] objData;
+
+    public void Environment(String objVar){
+        this.objective = objVar;
+    }
+
+
 
     //Method to fill the environment with a new sample of some dataset
     	//'proportion' is the approximate proportion of dataset to keep
@@ -61,6 +67,10 @@ class Environment {
     //Method returning the 'dataSet' property
     public double[][] getDataSet() {
     	return this.dataSet;
+    }
+    //Method to return the number of kept rows
+    public int getNumRows(){
+        return this.keptRows;
     }
 
 

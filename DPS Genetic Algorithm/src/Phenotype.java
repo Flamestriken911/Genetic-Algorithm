@@ -10,7 +10,7 @@ class Phenotype {
     //mutationRate is frequency of mutations and mutationDepth is max number of possible changes per mutation
     private double mutationRate;
     private int mutationDepth;
-    private boolean isMutant;
+    private boolean isMutant = false;
     private int numVars;
     private double[] varCoeffs;
     private OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
@@ -20,24 +20,23 @@ class Phenotype {
         //Init vars and mutate
     public Phenotype(boolean[] varBools, double mutRate, int mutDepth, boolean enableMutate) {
 
-        varSelection = varBools;
-        mutationRate = mutRate;
-        mutationDepth = mutDepth;
+        this.varSelection = varBools;
+        this.mutationRate = mutRate;
+        this.mutationDepth = mutDepth;
 
 
         //Mutate if enabled & triggered, and track whether it is a mutant
         if (enableMutate && Math.random() < mutationRate) {
             this.mutate();
-            isMutant = true;
+            this.isMutant = true;
         }
-        else {
-            isMutant = false;
-        }
+
 
         this.numVars = 0;
         for (boolean var : varSelection){
             if(var) this.numVars++;
         }
+        this.id = Arrays.toString(this.varSelection);
     }
 
     
@@ -116,15 +115,38 @@ class Phenotype {
     public void train(Environment env){
         //Get the y[] and x[][] data from the environment
         double[] Y = env.getObjData();
-        double[][] X = new double[][];
-        this.reg.newSampleData(env.getObjData(), env.getDataSet());
+        //Keep only the necessary columns for X
+        double[][] X = new double[Y.length][this.numVars];
+        int currentCol = 0;
+        int i=0;
+        while(currentCol<numVars){
+            if(varCoeffs[i]){
+                X[currentCol] = env.dataSet[i];
+                currentCol++;
+            }
+            i++;
+        }
+
+        this.reg.newSampleData(Y, X);
         this.varCoeffs = this.reg.estimateRegressionParameters();
     }
 
-    public double score(double[][] X, double[] Y){
-        this.reg.newXSampleData(X);
-        this.reg.newYSampleData(Y);
-        double adjR2 = reg.calculateAdjustedRSquared();
+    public double score(Environment env){
+        //Get the y[] and x[][] data from the environment
+        double[] Y = env.getObjData();
+        //Keep only the necessary columns for X
+        double[][] X = new double[Y.length][this.numVars];
+        int currentCol = 0;
+        int i=0;
+        while(currentCol<numVars){
+            if(varCoeffs[i]){
+                X[currentCol] = env.dataSet[i];
+                currentCol++;
+            }
+            i++;
+        }
+        this.reg.newSampleData(Y, X);
+        return reg.calculateAdjustedRSquared();
     }
 
 }

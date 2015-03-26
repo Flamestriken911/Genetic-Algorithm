@@ -38,13 +38,11 @@ class EvoRegress {
         double battleProportion = 0.1;
 
             //Read in the data from the CSV into an environment
-        ReadCSV data = new ReadCSV();
-        data.readFile(dataFile, true); 
         Environment env = new Environment();
-            //Put entire dataset into environment
-        env.getNewSample(data.getData(), 1.0);
-            //Keep array of labels for the columns
-        env.setLabels(data.getLabels());
+        env.getFromCSV(dataFile, true);
+        env.objective = objectiveVar;
+        env.separateObjVar();
+
 
 
         //Get initial list of phenotypes
@@ -73,15 +71,13 @@ class EvoRegress {
                 //We start with a sample proportion of 0.2
             Environment trainEnv = new Environment();
             trainEnv.getNewSample(env.getDataSet(), trainingProportion);
-
-
-
-/* Requires a few inputs that I can't currently provide for training phenotypes (X and Y for their varBools)*/
+            trainEnv.objective = objectiveVar;
+            trainEnv.separateObjVar();
 
 
             //Train the phenotypes on this environment
             for (Phenotype gene : genePool){
-                gene.train(trainEnv.X, trainEnv.Y);
+                gene.train(trainEnv);
             }
 
 
@@ -93,7 +89,9 @@ class EvoRegress {
                 if (!hasFought[fighter]){
                     hasFought[fighter] = true;
                     Environment battleGround = new Environment();
-                    battleGround.getNewSample(reader.getData(), battleProportion);
+                    battleGround.getNewSample(env.getDataSet(), battleProportion);
+                    battleGround.objective = objectiveVar;
+                    battleGround.separateObjVar();
                         //Generate # for which remaining unfought gene battles current gene
                     int fightNth  = (Math.random() * notFought) -1;
                     int vsIndex = 0;
@@ -112,10 +110,7 @@ class EvoRegress {
 
                         //Fighter fights vs gene at vsIndex unless they have same id
                     if (    !(genePool[fighter].id == genePool[fighter].id) ){
-                        if (
-                                genePool[fighter].score(battleGround.X, battleGround.Y) 
-                                > 
-                                genePool[vsIndex].score(battleGround.X, battleGround.Y))
+                        if (genePool[fighter].score(battleGround) > genePool[vsIndex].score(battleGround))
                         {
                             genePool[vsIndex] = genePool[fighter].reproduce();
                         } else{
