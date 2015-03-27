@@ -4,7 +4,8 @@ import java.util.Arrays;
 public class TestEnvironment {
 
 	public static void main(String[] args) {
-		double[][] data = 
+/*		
+			double[][] data = 
 			{
 				{	1,	1,	2,	3	},
 				{	2,	2,	3,	4	},
@@ -30,7 +31,23 @@ public class TestEnvironment {
         env.setLabels(labels);
 		
 		System.out.println(Arrays.deepToString(env.getDataSet()));
-		System.out.println(Arrays.toString(env.getNamedCol("Var1")));
+		System.out.println(Arrays.toString(env.getColByName("Var1")));
+*/
+		
+		String file = 
+	            "C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampledata.csv";
+		boolean hasLabels = true;
+		
+		Environment env = new Environment();
+		env.getFromCSV(file,  hasLabels);
+		
+		System.out.println(Arrays.deepToString(env.getDataSet()));
+//		System.out.println(Arrays.toString(env.getLabels()));
+		
+		env.setObjVar("Obj");
+		env.separateObjVar();
+		System.out.println(Arrays.deepToString(env.getDataSet()));
+		System.out.println(Arrays.toString(env.getObjData()));
 	}
 
 }

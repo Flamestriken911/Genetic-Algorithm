@@ -18,7 +18,7 @@ public class ReadCSV {
 	
 	
   //hasLabels indicates whether the first row of the CSV contains labels
-  public void ReadCSV(String csvFile, boolean hasLabels) {
+  public ReadCSV(String csvFile, boolean hasLabels) {
  
 	int[] rowsCols = getNumRowsCols(csvFile);
 	this.numRows = rowsCols[0];

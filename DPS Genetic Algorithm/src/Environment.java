@@ -4,10 +4,12 @@ class Environment {
 
     //Initialize variables
         //Reference to dataset to draw upon 
-    private double[][] dataSet;
+    public double[][] dataSet;
     private String[] labels;
     private int keptRows;
-    
+    private String objective;   
+    private double[] objData;
+
 
     //Method to fill the environment with a new sample of some dataset
     	//'proportion' is the approximate proportion of dataset to keep
@@ -61,16 +63,49 @@ class Environment {
     public double[][] getDataSet() {
     	return this.dataSet;
     }
+    //Method to return the number of kept rows
+    public int getNumRows(){
+        return this.keptRows;
+    }
 
 
     //Method to set the name of the objective variable
-    public setObjVar(String newObjVar){
+    public void setObjVar(String newObjVar){
         this.objective = newObjVar;
     }
 
 
     //Method to separate out the objective var from the other variables
-    private 
+    public void separateObjVar(){
+        this.setObjData(this.getColByName(this.objective));
+        int objCol = this.findColByName(this.objective);
+            //New dataset will have one fewer column than original
+        double[][] otherData = new double[this.dataSet.length][this.dataSet[0].length-1];
+        String[] otherLabels = new String[this.labels.length-1];
+        	//remove objective var column from dataset and add to objData
+        int currentCol=0;
+        for (int i=0; i<this.dataSet.length; i++){
+        	currentCol=0;
+        	for (int j=0; j<this.dataSet[0].length; j++){
+	        	if(j != objCol) {
+	                otherData[i][currentCol] = this.dataSet[i][j];
+	                currentCol++;
+	            } else {
+	            	this.objData[i] = this.dataSet[i][j];
+	            }
+	        }
+        }
+    	//remove objective var from labels
+        currentCol=0;
+        for (int i=0; i<this.labels.length-1; i++){
+        	if(i != objCol) {
+                otherLabels[currentCol] = this.labels[i];
+                currentCol++;
+            }
+        }
+        this.dataSet = otherData;
+        this.labels = otherLabels;
+    }
 
 
     //Method to get a column in a flat array
@@ -92,8 +127,9 @@ class Environment {
         return i;
     }
 
+
     //Method to get flat column for named variable
-    double[] getNamedCol(String colName){
+    public double[] getColByName(String colName){
         return this.getColumn(this.findColByName(colName));
     }
 
@@ -105,7 +141,15 @@ class Environment {
     public String[] getLabels(){
         return this.labels;
     }
+
+
+	public double[] getObjData() {
+		return objData;
+	}
+
+
+	public void setObjData(double[] objData) {
+		this.objData = objData;
+	}
     
 }
-
-
