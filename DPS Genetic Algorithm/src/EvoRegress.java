@@ -9,20 +9,21 @@ class EvoRegress {
 
 
 
-        //Initialize variables
-
-            //Strings with path to dataset and output destination
-
-        String dataPath =
-            "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm\\sampledata.csv";
-
-        String outPath =
-            "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm";
 
 
     static void main(String[] args) {
 
-            //String containing name of objective variable
+        //Initialize variables
+
+        //Strings with path to dataset and output destination
+
+    	String dataPath =
+        "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm\\sampledata.csv";
+
+    	String outPath =
+        "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm";
+
+    		//String containing name of objective variable
         String objectiveVar = "Objective";
 
 
@@ -39,9 +40,11 @@ class EvoRegress {
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
-        env.getFromCSV(dataFile, true);
-        env.objective = objectiveVar;
+        env.getFromCSV(dataPath, true);
+        env.setObjective(objectiveVar);
         env.separateObjVar();
+        	//Save the number of independent variables
+        int numVars = env.dataSet[0].length;
 
 
 
@@ -50,17 +53,25 @@ class EvoRegress {
         double mutationRate = 0.5;
         int mutationDepth = 1;
         Phenotype[] genePool = new Phenotype[numPhenotypes];
-            //Always have the zero-phenotype and the all-phenotype
-            genePool[0] = new Phenotype({false, false, false, false}, mutationRate, mutationDepth, 0);
-            genePool[1] = new Phenotype({true, true, true, true}, mutationRate, mutationDepth, 0);
+            //Always have the zero-phenotype 
+        boolean[] varBools = new boolean[numVars];
+        for (int i=0; i<numVars; i++){
+        	varBools[i] = false;
+        }
+        	//And the all-phenotype
+        genePool[0] = new Phenotype(varBools, mutationRate, mutationDepth, false);
+    	for (int i=0; i<numVars; i++){
+    		varBools[i] = true;
+    	}
+        genePool[1] = new Phenotype(varBools, mutationRate, mutationDepth, false);
             //All other phenotypes are generated randomly
-            for (int i=2; i<numPhenotypes; i++){
-                boolean[] varbools = new boolean[colsToKeep-1];
-                for (int j=0; j<colsToKeep; j++){
-                    varbools[j] = (Math.random()<0.5);
-                }
-                genePool[i] = new Phenotype(varbools, mutationRate, mutationDepth, 0);
+        for (int i=2; i<numPhenotypes; i++){
+        	boolean[] varbools = new boolean[numVars];
+            for (int j=0; j<numVars; j++){
+                varbools[j] = (Math.random()<0.5);
             }
+            genePool[i] = new Phenotype(varbools, mutationRate, mutationDepth, false);
+        }
 
 
         //Start the genetic algorithm
@@ -71,7 +82,7 @@ class EvoRegress {
                 //We start with a sample proportion of 0.2
             Environment trainEnv = new Environment();
             trainEnv.getNewSample(env.getDataSet(), trainingProportion);
-            trainEnv.objective = objectiveVar;
+            trainEnv.setObjective(objectiveVar);
             trainEnv.separateObjVar();
 
 
@@ -85,15 +96,15 @@ class EvoRegress {
                 //Note that boolean arrays initialize to all false values
             boolean[] hasFought = new boolean[numPhenotypes];
             int notFought = numPhenotypes;
-            for (int fighter=0; i<numPhenotypes; i++){
+            for (int fighter=0; fighter<numPhenotypes; fighter++){
                 if (!hasFought[fighter]){
                     hasFought[fighter] = true;
                     Environment battleGround = new Environment();
                     battleGround.getNewSample(env.getDataSet(), battleProportion);
-                    battleGround.objective = objectiveVar;
+                    battleGround.setObjective(objectiveVar);
                     battleGround.separateObjVar();
                         //Generate # for which remaining unfought gene battles current gene
-                    int fightNth  = (Math.random() * notFought) -1;
+                    int fightNth  = (int) (Math.random() * notFought);
                     int vsIndex = 0;
                     int numPassed = 0;
                         //Find the gene to fight
@@ -109,7 +120,7 @@ class EvoRegress {
                     hasFought[vsIndex] = true;
 
                         //Fighter fights vs gene at vsIndex unless they have same id
-                    if (    !(genePool[fighter].id == genePool[fighter].id) ){
+                    if (    !(genePool[fighter].getId() == genePool[fighter].getId()) ){
                         if (genePool[fighter].score(battleGround) > genePool[vsIndex].score(battleGround))
                         {
                             genePool[vsIndex] = genePool[fighter].reproduce();

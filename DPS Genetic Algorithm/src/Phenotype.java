@@ -120,7 +120,7 @@ class Phenotype {
         int currentCol = 0;
         int i=0;
         while(currentCol<numVars){
-            if(varCoeffs[i]){
+            if(varSelection[i]){
                 X[currentCol] = env.dataSet[i];
                 currentCol++;
             }
@@ -139,7 +139,7 @@ class Phenotype {
         int currentCol = 0;
         int i=0;
         while(currentCol<numVars){
-            if(varCoeffs[i]){
+            if(varSelection[i]){
                 X[currentCol] = env.dataSet[i];
                 currentCol++;
             }

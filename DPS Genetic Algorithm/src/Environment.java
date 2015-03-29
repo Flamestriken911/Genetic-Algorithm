@@ -97,7 +97,7 @@ class Environment {
         }
     	//remove objective var from labels
         currentCol=0;
-        for (int i=0; i<this.labels.length-1; i++){
+        for (int i=0; i<this.labels.length; i++){
         	if(i != objCol) {
                 otherLabels[currentCol] = this.labels[i];
                 currentCol++;
@@ -146,10 +146,14 @@ class Environment {
 	public double[] getObjData() {
 		return objData;
 	}
-
-
 	public void setObjData(double[] objData) {
 		this.objData = objData;
+	}
+	public String getObjective() {
+		return this.objective;
+	}
+	public void setObjective(String newObj) {
+		this.objective = newObj;
 	}
     
 }
