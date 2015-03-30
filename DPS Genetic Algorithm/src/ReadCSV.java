@@ -30,7 +30,7 @@ public class ReadCSV {
     //For now, assume all data will be type double
     int currentRow = 0;
 
-    this.data = new double[this.numRows][this.numCols];
+    this.data = new double[this.numRows-1][this.numCols];
     this.labels = new String[this.numCols];
 
     
@@ -41,6 +41,7 @@ public class ReadCSV {
 		boolean grabbedLabels = false;
 		while ((line = br.readLine()) != null) {
  
+			
 	        // Use comma as separator
 			String[] rowData = line.split(cvsSplitBy);
  

@@ -1,5 +1,6 @@
 //Code for the 'phenotypes' of the evolutionary algorithm
 import java.util.Arrays;
+
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 
@@ -13,7 +14,7 @@ class Phenotype {
     private boolean isMutant = false;
     private int numVars;
     private double[] varCoeffs;
-    private OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
+    public OLSMultipleLinearRegression reg = new OLSMultipleLinearRegression();
 
 
 //Class constructor
@@ -32,18 +33,24 @@ class Phenotype {
         }
 
 
-        this.numVars = 0;
-        for (boolean var : varSelection){
-            if(var) this.numVars++;
+        //Keep track of how many columns we have
+        this.numVars=0;
+        int varTracker = 0;
+        for (int i=0; i<varSelection.length; i++){
+            if(varSelection[i]==true) {
+            	varTracker++;
+            }
         }
-        this.id = Arrays.toString(this.varSelection);
+        this.numVars = varTracker;
+        this.id = Arrays.toString(this.varSelection); //update ID
     }
 
     
 //Code for reproduce method
     //Returns a new copy of itself, with possibility of mutation
     public Phenotype reproduce() {
-        Phenotype child = new Phenotype(varSelection, mutationRate, mutationDepth, true);
+    	boolean[] childVarSelection = Arrays.copyOf(this.varSelection, this.varSelection.length);
+        Phenotype child = new Phenotype(childVarSelection, mutationRate, mutationDepth, true);
         return child;
     }
 
@@ -52,10 +59,9 @@ class Phenotype {
     private void mutate() {
         //Randomly select number of mutations to make
         int numMutations = (int) ( Math.random() * mutationDepth + 1 );
-        int i;
         //Make selected number of changes
         //Note that currently a change can be made and then be un-made by the subsequent change within a single 'round' of mutation
-        for ( i=1; i<=numMutations; i++) {
+        for (int i=0; i<numMutations; i++) {
             //Randomly select an index to change, then switch its value
             int mutateIndex = (int) ( Math.random() * varSelection.length );
             //We use xor to cleanly switch the boolean
@@ -78,6 +84,10 @@ class Phenotype {
     public int getMutationDepth() {
         return mutationDepth;
     }
+    //Number of selected independent variables
+public int getNumVars() {
+    return numVars;
+}
         //Variable selection
     public boolean[] getVarSelection() {
         return varSelection;
@@ -117,16 +127,17 @@ class Phenotype {
         double[] Y = env.getObjData();
         //Keep only the necessary columns for X
         double[][] X = new double[Y.length][this.numVars];
-        int currentCol = 0;
         int i=0;
-        while(currentCol<numVars){
-            if(varSelection[i]){
-                X[currentCol] = env.dataSet[i];
-                currentCol++;
+        for(int currentCol=0; currentCol<this.varSelection.length; currentCol++){
+            if(varSelection[currentCol]){
+            	double[] dataCol = env.getColumn(currentCol);
+            	for (int j=0; j<Y.length; j++){
+            		X[j][i] = dataCol[j];
+            	}
+                i++;
+                if(i>this.numVars) break;
             }
-            i++;
         }
-
         this.reg.newSampleData(Y, X);
         this.varCoeffs = this.reg.estimateRegressionParameters();
     }
@@ -136,19 +147,34 @@ class Phenotype {
         double[] Y = env.getObjData();
         //Keep only the necessary columns for X
         double[][] X = new double[Y.length][this.numVars];
-        int currentCol = 0;
         int i=0;
-        while(currentCol<numVars){
-            if(varSelection[i]){
-                X[currentCol] = env.dataSet[i];
-                currentCol++;
+        for(int currentCol=0; currentCol<this.varSelection.length; currentCol++){
+            if(varSelection[currentCol]){
+            	double[] dataCol = env.getColumn(currentCol);
+            	for (int j=0; j<Y.length; j++){
+            		X[j][i] = dataCol[j];
+            	}
+                i++;
+                if(i>this.numVars) break;
             }
-            i++;
         }
         this.reg.newSampleData(Y, X);
         return reg.calculateAdjustedRSquared();
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
