@@ -42,7 +42,17 @@ class Phenotype {
             }
         }
         this.numVars = varTracker;
-        this.id = Arrays.toString(this.varSelection); //update ID
+        
+        //update ID
+        this.id = "";
+        for(int i=0; i<this.varSelection.length; i++){
+        	if(this.varSelection[i]){
+        		this.id +="1";
+        	}
+        	else{
+        		this.id +="0";
+        	}
+        }
     }
 
     
@@ -73,8 +83,7 @@ class Phenotype {
     //Getter methods
         //ID
     public String getId() {
-        id = Arrays.toString(varSelection);
-        return id;
+        return this.id;
     }
         //Mutation rate
     public double getMutationRate() {

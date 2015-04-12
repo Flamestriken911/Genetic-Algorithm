@@ -9,13 +9,15 @@ class Environment {
     private int keptRows;
     private String objective;   
     private double[] objData;
+    private double keepProportion=1;
 
 
     //Method to fill the environment with a new sample of some dataset
     	//'proportion' is the approximate proportion of dataset to keep
     public void getNewSample(double[][] data, double proportion) {
-       	//If the proportion is 1, then dataSet is the full array provided
-    	if (proportion==1.0){
+       	this.keepProportion = proportion;
+    	//If the proportion is 1, then dataSet is the full array provided
+    	if (this.keepProportion==1.0){
     		this.dataSet = data;
     		this.keptRows = data.length;
     	}
@@ -28,7 +30,7 @@ class Environment {
 	    	boolean[] keepList = new boolean[dataRows];
 	    	for (int i=0; i<dataRows; i++) {
 	    		keepList[i] = (false);
-	    		if(Math.random() < proportion) {
+	    		if(Math.random() < this.keepProportion) {
 	        		keepList[i] = (true);
 	        		this.keptRows++;
 	    		}
@@ -116,39 +118,14 @@ class Environment {
     public void separateObjVar(){
         this.setObjData(this.getColByName(this.objective));
         int objCol = this.findColByName(this.objective);
-            //New dataset will have one fewer column than original
-        double[][] otherData = new double[this.dataSet.length][this.dataSet[0].length-1];
-        String[] otherLabels = new String[this.labels.length-1];
-        	//remove objective var column from dataset and add to objData
-        int currentCol=0;
-        for (int i=0; i<this.dataSet.length; i++){
-        	currentCol=0;
-        	for (int j=0; j<this.dataSet[0].length; j++){
-	        	if(j != objCol) {
-	                otherData[i][currentCol] = this.dataSet[i][j];
-	                currentCol++;
-	            } else {
-	            	this.objData[i] = this.dataSet[i][j];
-	            }
-	        }
-        }
-    	//remove objective var from labels
-        currentCol=0;
-        for (int i=0; i<this.labels.length; i++){
-        	if(i != objCol) {
-                otherLabels[currentCol] = this.labels[i];
-                currentCol++;
-            }
-        }
-        this.dataSet = otherData;
-        this.labels = otherLabels;
+        removeCol(objCol);    
     }
 
 
     //Method to get a column in a flat array
     public double[] getColumn(int colNum){
-        double[] returnColumn = new double[this.keptRows];
-        for (int i=0; i<this.keptRows; i++){
+        double[] returnColumn = new double[this.dataSet.length];
+        for (int i=0; i<this.dataSet.length; i++){
             returnColumn[i] = dataSet[i][colNum];
         }
         return returnColumn;
@@ -170,6 +147,65 @@ class Environment {
         return this.getColumn(this.findColByName(colName));
     }
 
+    
+    //Method to remove a column and its label
+    public String removeCol(int col){
+    	String removedLabel = this.labels[col];
+    	double[][] newdata = new double[this.dataSet.length][this.dataSet[0].length-1];
+    	String[] newlabels = new String[this.labels.length-1];
+    	int currentCol=0;
+    	for (int i=0;i<this.dataSet[0].length;i++){
+    		if(i!=col)	{
+    			for (int j=0;j<this.dataSet.length;j++){
+    					newdata[j][currentCol] = this.dataSet[j][i];
+    			}
+    			newlabels[currentCol] = this.labels[i];
+    			currentCol++;
+    		}
+    	}
+    	this.dataSet = newdata;
+    	this.labels = newlabels;
+    	return removedLabel;
+    }
+    
+    
+    //Function to find probability of all 0s or all 1s in a data row
+    	//Will return -1 if column is non-binary
+    public double calcFailRate(int col, double keepRate){
+    	double[] colToCheck = this.getColumn(col);
+    	int rows = colToCheck.length;
+    	double failRate = -1;
+    	int num1s = 0;
+    	int num0s = 0;
+    	for (int i=0; i<rows; i++){
+    		if(colToCheck[i]==0) num0s++;
+    		else if(colToCheck[i]==1) num1s++;
+    		else return -1;
+    	}
+    	double probAll0 = (double) num0s / rows;
+    	double probAll1 = (double) num1s / rows;
+    	failRate = Math.pow(probAll0, Math.ceil(rows*keepRate)) + Math.pow(probAll1, Math.ceil(rows*keepRate));
+    	return failRate;
+    }
+    
+    //Function to remove columns if they are more likely to fail than a given threshold
+    String[] useFailureThreshold(double keepRate, double threshold){
+    	String[] removedList = new String[this.labels.length];
+    	int numRemoved = 0;
+    	int i = this.labels.length-1;
+    	while (i>=0){
+    		System.out.println(this.labels[i]);
+    		double failrate = this.calcFailRate(i, keepRate);
+    		System.out.println(failrate);
+    		if(failrate > threshold){
+    			removedList[numRemoved] = this.removeCol(i) + " : " + failrate;
+    			numRemoved++;
+    		}
+    		i--;
+    	}
+    	return removedList;
+    }
+    
 
     //Methods to set and get the labels property of the environment
     public void setLabels(String[] newLabels){

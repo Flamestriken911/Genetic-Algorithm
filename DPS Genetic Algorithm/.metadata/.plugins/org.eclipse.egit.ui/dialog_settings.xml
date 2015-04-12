@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item value="C:\Users\Chris\Common Files\Research and Work\School\Spring-2015\MATH 4779\Evolutionary Regression Algorithm\Genetic-Algorithm\.git" key="GitSelectRepositoryPage.lastRepository"/>
+	<item value="0" key="org.eclipse.egit.ui.internal.clone.GitSelectWizardPageWizardSel"/>
 	<section name="GitImportWizard">
+		<item value="true" key="GitProjectsImportPage.STORE_NESTED_PROJECTS"/>
 	</section>
 </section>
