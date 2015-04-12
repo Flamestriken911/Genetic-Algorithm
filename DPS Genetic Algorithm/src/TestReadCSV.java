@@ -4,11 +4,11 @@ import java.util.Arrays;
 public class TestReadCSV {
 
 	public static void main(String[] args) {
-		String file = 
-	            "C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampledata.csv";
+		String file = "sampledata.csv";
 		boolean hasLabels = true;
 		
-	
+		  System.out.println(file);
+
 		ReadCSV read = new ReadCSV(file, hasLabels);
 
 		double[][] data = read.getData();
@@ -19,6 +19,7 @@ public class TestReadCSV {
 
 		int[] rowcol = read.getNumRowsCols(file);
 		System.out.println(Arrays.toString(rowcol));
+	
 	}
 
 }

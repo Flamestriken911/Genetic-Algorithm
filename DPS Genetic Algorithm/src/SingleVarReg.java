@@ -8,11 +8,12 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 class SingleVarReg {
 
-static String objectiveVar = "SCHOOL_NUMBER";
+static String objectiveVar = "NP";
 static String dataFile     = 
-    "C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampledata.csv";
+	"math_test_file.csv";
 static String outFile      = 
-    "C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampleoutput.csv";
+	"math_test_file_output.csv";
+
 static boolean hasLabels   = true;
 
 
@@ -22,7 +23,7 @@ static boolean hasLabels   = true;
         Environment env = new Environment();
             //Put entire dataset into environment
         env.getFromCSV(dataFile, hasLabels);
-        env.setObjVar("Obj");
+        env.setObjVar(objectiveVar);
         env.separateObjVar();
         
         
@@ -48,7 +49,6 @@ static boolean hasLabels   = true;
 			
 			//Loop through (non-objective) vars and regress on each
         for  (String varName : env.getLabels()){
-            System.out.println(varName);
             reg.clear();
             double[] X = env.getColByName(varName);
             double[][] XY = new double[Y.length][2];
@@ -56,7 +56,6 @@ static boolean hasLabels   = true;
             	XY[i][0]=X[i];
             	XY[i][1]=Y[i];
             }
-            System.out.println(Arrays.deepToString(XY));
             reg.addData(XY);
             RegressionResults results = reg.regress();
                 //Write coeffs and r2 to file

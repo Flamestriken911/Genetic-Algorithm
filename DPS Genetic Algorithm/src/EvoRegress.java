@@ -18,39 +18,41 @@ class EvoRegress {
         //Strings with path to dataset and output destination
 
     	String dataPath =
-    		    "C:\\Users\\Chris\\Desktop\\Chris\\Learning & Research\\School\\Spring-2015\\MATH 4779\\DPS Genetic Workspace\\Genetic-Algorithm\\DPS Genetic Algorithm\\src\\sampledata.csv";
+    		    "M is ready to run.csv";
 
     	String outPath =
-        "C:\\Users\\Chris\\Common Files\\Research and Work\\School\\Spring-2015\\MATH 4779\\Evolutionary Regression Algorithm\\Genetic-Algorithm\\DPS Genetic Algorithm";
+        	"output.csv";
 
     		//String containing name of objective variable
-        String objectiveVar = "Obj";
+        String objectiveVar = "NP";
 
 
-            //Dictionary to contain Phenotype IDs and their associated boolean variable lists
-        //HashMap<String, boolean[]> phenoTracker = new HashMap<String, boolean[]>();
+            //Dictionary to contain Phenotype IDs and the number of each in gene pool
+        //HashMap<String, int> phenoTracker = new HashMap<String, int>();
 
 
             //Control variables for main while function
         boolean converged = false;
         int generation = 0;
-        int maxGeneration = 4;
-        double trainingProportion = 0.9;
-        double battleProportion = 0.8;
+        int maxGeneration = 8;
+        double trainingProportion = 0.4;
+        double battleProportion = 0.15;
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
         env.getFromCSV(dataPath, true);
         env.setObjective(objectiveVar);
         env.separateObjVar();
+        	//Remove columns likely to be all 1s or 0s in sample matrices
+        System.out.println(Arrays.toString(env.useFailureThreshold(trainingProportion,.00001)));
         	//Save the number of independent variables
         int numVars = env.dataSet[0].length;
-
+        
         
         //Get initial list of phenotypes
-        int numPhenotypes = 10;
-        double mutationRate = 0.5;
-        int mutationDepth = 1;
+        int numPhenotypes = 40;
+        double mutationRate = 0.2;
+        int mutationDepth = 3;
         Phenotype[] genePool = new Phenotype[numPhenotypes];
             //Always have the zero-phenotype 
         boolean[] noBools = new boolean[numVars];	//No need to initialize since booleans default to false

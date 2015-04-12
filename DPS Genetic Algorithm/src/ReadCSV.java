@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ReadCSV {
 
@@ -19,7 +20,6 @@ public class ReadCSV {
 	
   //hasLabels indicates whether the first row of the CSV contains labels
   public ReadCSV(String csvFile, boolean hasLabels) {
- 
 	int[] rowsCols = getNumRowsCols(csvFile);
 	this.numRows = rowsCols[0];
 	this.numCols = rowsCols[1];
@@ -49,6 +49,7 @@ public class ReadCSV {
                 //Access data via rowData[column#]
                 for (int currentCol=0; currentCol<rowData.length; currentCol++) {
                 	this.data[currentRow][currentCol] = Double.parseDouble(rowData[currentCol]);
+                	
                 }
                 currentRow++;
             }
