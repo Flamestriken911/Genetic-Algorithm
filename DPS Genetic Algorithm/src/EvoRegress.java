@@ -1,6 +1,7 @@
 //Class that runs all the evo-regression stuff. Contains the main() method
 import java.util.*;
-
+import java.io.FileWriter;
+import java.io.IOException;
 
 class EvoRegress {
 
@@ -37,6 +38,7 @@ class EvoRegress {
         int maxGeneration = 8;
         double trainingProportion = 0.4;
         double battleProportion = 0.15;
+        int numPhenotypes = 40;
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
@@ -50,7 +52,6 @@ class EvoRegress {
         
         
         //Get initial list of phenotypes
-        int numPhenotypes = 40;
         double mutationRate = 0.2;
         int mutationDepth = 3;
         Phenotype[] genePool = new Phenotype[numPhenotypes];
@@ -153,7 +154,69 @@ class EvoRegress {
         }
 
 
+        //Get final generation data ready for output
+        String idList[] = new String[numPhenotypes];
+        int idNums[] = new int[numPhenotypes];
+        int i=0;
+        String currentID;
+        for (Phenotype gene : genePool){
+        	currentID = gene.getId();
+        	int j=0;
+        	while (j<i){
+        		if (currentID.equals(idList[j])){
+        			idNums[j] +=1;
+        			break;
+        		}
+        		j++;
+        	}
+        	if (j==i){
+        		idList[i] = currentID;
+        		idNums[i] = 1;
+        	}
+        }
+        
+        
+        //Output the results to a csv
+        FileWriter fileWriter = null;
+		
+		try {
+			fileWriter = new FileWriter(outPath);
 
+			//Write the CSV file header
+			fileWriter.append("ID,NumberPhenotypes");
+			
+			//Add a new line separator after the header
+			fileWriter.append("\n");
+			
+			//Write a row to the CSV file
+			for (i=0; i<idList.length; i++) {
+				fileWriter.append(idList[i]);
+				fileWriter.append(",");
+				fileWriter.append(String.valueOf(idNums[i]));
+				fileWriter.append("/n");
+			}
+
+			
+			
+			System.out.println("CSV file was created successfully !!!");
+			
+		} catch (Exception e) {
+			System.out.println("Error in CsvFileWriter !!!");
+			e.printStackTrace();
+		} finally {
+			
+			try {
+				fileWriter.flush();
+				fileWriter.close();
+			} catch (IOException e) {
+				System.out.println("Error while flushing/closing fileWriter !!!");
+                e.printStackTrace();
+			}
+			
+		}
+        
+        
+        
 
     }
 
