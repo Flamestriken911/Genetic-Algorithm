@@ -149,6 +149,10 @@ public int getNumVars() {
         }
         this.reg.newSampleData(Y, X);
         this.varCoeffs = this.reg.estimateRegressionParameters();
+        //Now replace the data with 'null' data to reduce memory demands for idle phenotypes
+        double nullY[] = {0,0};
+        double nullX[][] = {{1},{0}};
+        this.reg.newSampleData(nullY,nullX);
     }
 
     public double score(Environment env){
@@ -168,7 +172,12 @@ public int getNumVars() {
             }
         }
         this.reg.newSampleData(Y, X);
-        return reg.calculateAdjustedRSquared();
+        double score = reg.calculateAdjustedRSquared();
+        //Now replace the data with 'null' data to reduce memory demands for idle phenotypes
+        double nullY[] = {0,0};
+        double nullX[][] = {{1},{0}};
+        this.reg.newSampleData(nullY,nullX);
+        return score;
     }
 
 }

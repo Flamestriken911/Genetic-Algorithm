@@ -194,9 +194,7 @@ class Environment {
     	int numRemoved = 0;
     	int i = this.labels.length-1;
     	while (i>=0){
-    		System.out.println(this.labels[i]);
     		double failrate = this.calcFailRate(i, keepRate);
-    		System.out.println(failrate);
     		if(failrate > threshold){
     			removedList[numRemoved] = this.removeCol(i) + " : " + failrate;
     			numRemoved++;
