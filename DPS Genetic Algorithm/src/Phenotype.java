@@ -131,7 +131,7 @@ public int getNumVars() {
 
 
     //Train the phenotype on the provided environment
-    public void train(Environment env){
+    public double[] train(Environment env){
         //Get the y[] and x[][] data from the environment
         double[] Y = env.getObjData();
         //Keep only the necessary columns for X
@@ -153,6 +153,19 @@ public int getNumVars() {
         double nullY[] = {0,0};
         double nullX[][] = {{1},{0}};
         this.reg.newSampleData(nullY,nullX);
+        //Get an array with the coefficients in the right spots
+        double coeffsArray[] = new double[this.numVars];
+        int numAdded = 0;
+        for (i=0; i<coeffsArray.length; i++){
+        	if(this.varSelection[i]){
+        		coeffsArray[i] = this.varCoeffs[numAdded];
+        		numAdded++;
+        	}
+        	else{
+        		coeffsArray[i] = 0;
+        	}
+        }
+        return coeffsArray;
     }
 
     public double score(Environment env){

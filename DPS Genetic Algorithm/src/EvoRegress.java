@@ -21,6 +21,7 @@ class EvoRegress {
     	String dataPath = "M - Modified - Small.csv";
     	String removedColsPath = "Removed Cols.csv";
     	String outPath = "output.csv";
+    	String regResultsPath = "results.csv";
 
     		//String containing name of objective variable
         String objectiveVar = "NP";
@@ -33,10 +34,10 @@ class EvoRegress {
             //Control variables for main while function
         boolean converged = false;
         int generation = 0;
-        int maxGeneration = 0;
+        int maxGeneration = 6;
         double trainingProportion = 0.3;
         double battleProportion = 0.15;
-        int numPhenotypes = 50;	//Has to be even number for pairings to work
+        int numPhenotypes = 100;	//Has to be even number for pairings to work
         double mutationRate = 0.2;
         int mutationDepth = 8;
 
@@ -184,14 +185,79 @@ class EvoRegress {
                     
                 }
             }
+            
+            //Get generation data ready for output
+            String idList[] = new String[numPhenotypes];
+            int idNums[] = new int[numPhenotypes];
+            int i=0;
+            int j;
+            int numAdded = 0;
+            String currentID;
+            for (i=0; i<genePool.length; i++){
+            	currentID = genePool[i].getId();
+            	j=0;
+            	while (j<i){
+            		if (currentID.equals(idList[j])){
+            			idNums[j] +=1;
+            			break;
+            		}
+            		j++;
+            	}
+            	if (j==i){
+            		idList[numAdded] = currentID;
+            		idNums[numAdded] = 1;
+            		numAdded++;
+            	}
+            }
+
+            //Output the results to a csv
+            fileWriter = null;
+    		
+    		try {
+    			if(generation==0){
+	    			fileWriter = new FileWriter(outPath);	
+	    			//Write the CSV file header
+	    			fileWriter.append("ID,NumberPhenotypes");
+    			}else{
+	    			fileWriter = new FileWriter(outPath,true);
+    			}
+    			//Add a new line separator after the header
+    			fileWriter.append("\n");
+    			//Write a row to the CSV file
+    			for (i=0; i<numAdded; i++) {   				
+    				fileWriter.append(String.valueOf(generation));
+    				fileWriter.append(",\'");
+    				fileWriter.append(idList[i]);
+    				fileWriter.append("\',");
+    				fileWriter.append(String.valueOf(idNums[i]));
+    				fileWriter.append("\n");
+    			}
+
+    			
+    			
+    			System.out.println("CSV file was created successfully !!!");
+    			
+    		} catch (Exception e) {
+    			System.out.println("Error in CsvFileWriter !!!");
+    			e.printStackTrace();
+    		} finally {
+    			
+    			try {
+    				fileWriter.flush();
+    				fileWriter.close();
+    			} catch (IOException e) {
+    				System.out.println("Error while flushing/closing fileWriter !!!");
+                    e.printStackTrace();
+    			}
+    			
+    		}
+            
+            
+            
+            
             generation++;
         }
 
-
-        
-        
-        
-        
         //Get final generation data ready for output
         String idList[] = new String[numPhenotypes];
         int idNums[] = new int[numPhenotypes];
@@ -215,29 +281,38 @@ class EvoRegress {
         		numAdded++;
         	}
         }
+
         
-        //Output the results to a csv
+        
+		//Finally, run the regression on the full available dataset for the largest phenotype
+			//Then output the coefficients for each variable in a file
+		//Start by finding the index of the largest phenotype
+		int numOfLargest = 0;
+		int maxIndex = 0;
+		for (i=0; i<idNums.length; i++){
+			if(numOfLargest<idNums[i]){
+				numOfLargest = idNums[i];
+				maxIndex = i;
+			}
+		}
+		//Now run the regression and get the coefficients for the phenotype
+		double finalCoeffs[] = genePool[maxIndex].train(env);
+
+		//Output the results to a csv
         fileWriter = null;
 		
 		try {
-			fileWriter = new FileWriter(outPath);
+			fileWriter = new FileWriter(regResultsPath);
 
 			//Write the CSV file header
-			fileWriter.append("ID,NumberPhenotypes");
+			fileWriter.append(Arrays.toString(env.getLabels()));
 			
 			//Add a new line separator after the header
 			fileWriter.append("\n");
 			
-			//Write a row to the CSV file
-			for (i=0; i<numAdded; i++) {
-				fileWriter.append(idList[i]);
-				fileWriter.append(",");
-				fileWriter.append(String.valueOf(idNums[i]));
-				fileWriter.append("\n");
-			}
-
-			
-			
+			//Write coeffs to the CSV file
+			fileWriter.append(Arrays.toString(finalCoeffs));
+		
 			System.out.println("CSV file was created successfully !!!");
 			
 		} catch (Exception e) {
@@ -254,19 +329,6 @@ class EvoRegress {
 			}
 			
 		}
-        
-        
-		//Finally, run the regression on the full available dataset for the largest phenotype
-			//Then output the coefficients for each variable in a file
-		//Start by finding the size of the largest phenotype
-		int numOfLargest = 0;
-		for (i=0; i<idNums.length; i++){
-			if(numOfLargest<idNums[i]){
-				numOfLargest = idNums[i];
-			}
-		}
-		//Now run the regression and get the coefficients for the phenotype
-		
 		
     }
 
