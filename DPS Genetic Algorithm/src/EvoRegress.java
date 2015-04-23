@@ -25,7 +25,7 @@ class EvoRegress {
 
     		//String containing name of objective variable
         String objectiveVar = "NP";
-
+       
 
             //Dictionary to contain Phenotype IDs and the number of each in gene pool
         //HashMap<String, int> phenoTracker = new HashMap<String, int>();
@@ -33,13 +33,14 @@ class EvoRegress {
 
             //Control variables for main while function
         boolean converged = false;
+        boolean twinsMutate = true; //Whether chance for one to mutate when identical phenotypes fight
         int generation = 0;
-        int maxGeneration = 6;
-        double trainingProportion = 0.3;
+        int maxGeneration = 10;
+        double trainingProportion = 0.2;
         double battleProportion = 0.15;
-        int numPhenotypes = 100;	//Has to be even number for pairings to work
-        double mutationRate = 0.2;
-        int mutationDepth = 8;
+        int numPhenotypes = 10;	//Has to be even number for pairings to work
+        double mutationRate = 0.25;
+        int mutationDepth = 4;
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
@@ -93,14 +94,16 @@ class EvoRegress {
             //Always have the zero-phenotype 
         boolean[] noBools = new boolean[numVars];	//No need to initialize since booleans default to false
         genePool[0] = new Phenotype(noBools, mutationRate, mutationDepth, false);
-        	//And the all-phenotype
+/*        	//And the all-phenotype
         boolean[] allBools = new boolean[numVars];
     	for (int i=0; i<numVars; i++){
     		allBools[i] = true;
     	}
         genePool[1] = new Phenotype(allBools, mutationRate, mutationDepth, false);
+*/
             //All other phenotypes are generated randomly
-        for (int i=2; i<numPhenotypes; i++){
+//        for (int i=2; i<numPhenotypes; i++){
+          for (int i=1; i<numPhenotypes; i++){
         	boolean[] varbools = new boolean[numVars];
             for (int j=0; j<numVars; j++){
                 varbools[j] = (Math.random()<0.5);
@@ -164,19 +167,18 @@ class EvoRegress {
 	                    	System.out.println("#"+fighter+" wins with "+genePool[fighter].score(battleGround)+" vs "+genePool[vsIndex].score(battleGround)+"!");
 	                    	genePool[vsIndex] = genePool[fighter].reproduce();
 	                    	if(genePool[vsIndex].getIsMutant()){
-	                    		System.out.println("This  : "+genePool[fighter].getId());
-	                    		System.out.println("Became: "+genePool[vsIndex].getId());
 	                    	}
 	                    } else{
 	                    	System.out.println("#"+vsIndex+" wins with "+genePool[vsIndex].score(battleGround)+" vs "+genePool[fighter].score(battleGround)+"!");
 	                        genePool[fighter] = genePool[vsIndex].reproduce();
 	                    	if(genePool[fighter].getIsMutant()){
-	                    		System.out.println("This  : "+genePool[vsIndex].getId());
-	                    		System.out.println("Became: "+genePool[fighter].getId());
 	                    	}
 	                    }
 	                }
-	                else System.out.println("They were identical and didn't fight");
+	                else{
+	                	System.out.println("They were identical and didn't fight");
+	                	if(twinsMutate)  genePool[fighter] = genePool[vsIndex].reproduce();;
+	                }
 	                	//If all phenotypes have fought, start the new generation
 	                if(notFought==0){
                     	break;
@@ -256,6 +258,21 @@ class EvoRegress {
             
             
             generation++;
+            
+            
+            //Ask if program should continue after final generation
+            if(generation==maxGeneration){
+	            Scanner reader = new Scanner(System.in);
+	            System.out.println("Would you like to continue running? y/n:");
+	            if(reader.next().equals("y")){
+	            	System.out.println("How many more generations?");
+		            maxGeneration += reader.nextInt();   
+	            }else{
+	            	reader.close();
+	            }
+            }            
+            
+            
         }
 
         //Get final generation data ready for output
