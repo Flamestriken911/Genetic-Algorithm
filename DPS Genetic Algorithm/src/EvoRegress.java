@@ -18,13 +18,15 @@ class EvoRegress {
 
         //Strings with path to dataset and output destination
 
-    	String dataPath = "M - Modified - Small.csv";
-    	String removedColsPath = "Removed Cols.csv";
-    	String outPath = "output.csv";
-    	String regResultsPath = "results.csv";
+    	String dataPath = ".\\Teacher-School Data\\data_teachers_run mod.csv";
+//    	String dataPath = ".\\Student-Teacher Data\\M ready HSonly ssprev npprev inc - Small - Useable - No SS.csv";
+    	String removedColsPath = ".\\Output\\Removed Cols.csv";
+    	String outPath = ".\\Output\\output.csv";
+    	String regResultsPath = ".\\Output\\results.csv";
 
     		//String containing name of objective variable
-        String objectiveVar = "NP";
+//        String objectiveVar = "NP";
+        String objectiveVar = "retention";
        
 
             //Dictionary to contain Phenotype IDs and the number of each in gene pool
@@ -33,14 +35,14 @@ class EvoRegress {
 
             //Control variables for main while function
         boolean converged = false;
-        boolean twinsMutate = true; //Whether chance for one to mutate when identical phenotypes fight
+        boolean fratricide = false; //Whether chance for one to mutate when identical phenotypes fight
         int generation = 0;
-        int maxGeneration = 10;
-        double trainingProportion = 0.2;
-        double battleProportion = 0.15;
-        int numPhenotypes = 10;	//Has to be even number for pairings to work
-        double mutationRate = 0.25;
-        int mutationDepth = 4;
+        int maxGeneration = 20;
+        double trainingProportion = 0.3;
+        double battleProportion = 0.3;
+        int numPhenotypes = 100;	//Has to be even number for pairings to work
+        double mutationRate = 0.2;
+        int mutationDepth = 6;
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
@@ -48,7 +50,7 @@ class EvoRegress {
         env.setObjective(objectiveVar);
         env.separateObjVar();
         	//Remove columns likely to be all 1s or 0s in sample matrices
-        String[] failedCols = env.useFailureThreshold(trainingProportion,.00001);
+        String[] failedCols = env.useFailureThreshold(Math.min(trainingProportion, battleProportion),.00001);
         System.out.println(Arrays.toString(failedCols));
         //Output the results to a csv
         FileWriter fileWriter = null;
@@ -177,7 +179,7 @@ class EvoRegress {
 	                }
 	                else{
 	                	System.out.println("They were identical and didn't fight");
-	                	if(twinsMutate)  genePool[fighter] = genePool[vsIndex].reproduce();;
+	                	if(fratricide)  genePool[fighter] = genePool[vsIndex].reproduce();;
 	                }
 	                	//If all phenotypes have fought, start the new generation
 	                if(notFought==0){
