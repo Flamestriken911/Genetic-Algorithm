@@ -154,10 +154,14 @@ public int getNumVars() {
         double nullX[][] = {{1},{0}};
         this.reg.newSampleData(nullY,nullX);
         //Get an array with the coefficients in the right spots
-        double coeffsArray[] = new double[this.numVars];
+        double coeffsArray[] = new double[this.varSelection.length+1];
         int numAdded = 0;
-        for (i=0; i<coeffsArray.length; i++){
-        	if(this.varSelection[i]){
+        for (i=0; i<this.varSelection.length+1; i++){
+        	if(i==0){
+        		coeffsArray[i] = this.varCoeffs[numAdded];
+        		numAdded++;        		
+        	}
+        	else if(this.varSelection[i-1]){
         		coeffsArray[i] = this.varCoeffs[numAdded];
         		numAdded++;
         	}

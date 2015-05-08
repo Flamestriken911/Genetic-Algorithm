@@ -5,44 +5,35 @@ import java.io.IOException;
 
 class EvoRegress {
 
-
-
-
-
-
-
-
     public static void main(String[] args) {
 
         //Initialize variables
 
         //Strings with path to dataset and output destination
-
+    		//Always have one dataPath variable commented out, depending on which model you want to run
     	String dataPath = ".\\Teacher-School Data\\data_teachers_run mod.csv";
 //    	String dataPath = ".\\Student-Teacher Data\\M ready HSonly ssprev npprev inc - Small - Useable - No SS.csv";
     	String removedColsPath = ".\\Output\\Removed Cols.csv";
-    	String outPath = ".\\Output\\output.csv";
+    	String outPath = ".\\Output\\generation_history.csv";	//Holds the historical data of population makeup over generations
     	String regResultsPath = ".\\Output\\results.csv";
 
     		//String containing name of objective variable
 //        String objectiveVar = "NP";
         String objectiveVar = "retention";
        
-
             //Dictionary to contain Phenotype IDs and the number of each in gene pool
         //HashMap<String, int> phenoTracker = new HashMap<String, int>();
 
-
             //Control variables for main while function
         boolean converged = false;
-        boolean fratricide = false; //Whether chance for one to mutate when identical phenotypes fight
+        boolean fratricide = true; //Whether chance for one to mutate when identical phenotypes fight
         int generation = 0;
-        int maxGeneration = 20;
-        double trainingProportion = 0.3;
-        double battleProportion = 0.3;
+        int maxGeneration = 1000;
+        double trainingProportion = 0.30;
+        double battleProportion = 0.30;
         int numPhenotypes = 100;	//Has to be even number for pairings to work
         double mutationRate = 0.2;
-        int mutationDepth = 6;
+        int mutationDepth = 5;
 
             //Read in the data from the CSV into an environment
         Environment env = new Environment();
@@ -55,12 +46,11 @@ class EvoRegress {
         //Output the results to a csv
         FileWriter fileWriter = null;
 		
+        //Write any removed variables to file
 		try {
 			fileWriter = new FileWriter(removedColsPath);
-
 			//Write the CSV file header
 			fileWriter.append("Variable");
-			
 			//Add a new line separator after the header
 			fileWriter.append("\n");
 			
@@ -74,9 +64,7 @@ class EvoRegress {
 		} catch (Exception e) {
 			System.out.println("Error in CsvFileWriter !!!");
 			e.printStackTrace();
-
 		}finally {
-			
 			try {
 				fileWriter.flush();
 				fileWriter.close();
@@ -84,7 +72,6 @@ class EvoRegress {
 				System.out.println("Error while flushing/closing fileWriter !!!");
                 e.printStackTrace();
 			}
-			
 		}
 
         	//Save the number of independent variables
@@ -93,19 +80,8 @@ class EvoRegress {
         
         //Get initial list of phenotypes
         Phenotype[] genePool = new Phenotype[numPhenotypes];
-            //Always have the zero-phenotype 
-        boolean[] noBools = new boolean[numVars];	//No need to initialize since booleans default to false
-        genePool[0] = new Phenotype(noBools, mutationRate, mutationDepth, false);
-/*        	//And the all-phenotype
-        boolean[] allBools = new boolean[numVars];
-    	for (int i=0; i<numVars; i++){
-    		allBools[i] = true;
-    	}
-        genePool[1] = new Phenotype(allBools, mutationRate, mutationDepth, false);
-*/
-            //All other phenotypes are generated randomly
-//        for (int i=2; i<numPhenotypes; i++){
-          for (int i=1; i<numPhenotypes; i++){
+            //All phenotypes are generated randomly
+          for (int i=0; i<numPhenotypes; i++){
         	boolean[] varbools = new boolean[numVars];
             for (int j=0; j<numVars; j++){
                 varbools[j] = (Math.random()<0.5);
@@ -115,7 +91,7 @@ class EvoRegress {
 
         
         //Start the genetic algorithm
-            //Run until convergence or max iterations
+            //Run until max iterations
         while (!converged && generation < maxGeneration) {
             System.out.println("Generation "+generation);
 
@@ -125,17 +101,15 @@ class EvoRegress {
             trainEnv.setObjective(objectiveVar);
             trainEnv.getNewSample(env.getDataSet(), env.getObjData(), env.getLabels(), trainingProportion);
             
-
             //Train the phenotypes on this environment
             for (Phenotype gene : genePool){
                 gene.train(trainEnv);
             }
-
             
             //Match up phenotypes for 'battle' and put them in a training environment
                 //Note that boolean arrays initialize to all false values
-            boolean[] hasFought = new boolean[numPhenotypes];
-            int notFought = numPhenotypes;
+            boolean[] hasFought = new boolean[numPhenotypes];	//Array of boolean values of whether phenotype of that index has fought already
+            int notFought = numPhenotypes;	//Number that haven't fought yet
             for (int fighter=0; fighter<numPhenotypes; fighter++){
                 if (!hasFought[fighter]){
                     hasFought[fighter] = true;
@@ -256,11 +230,7 @@ class EvoRegress {
     			
     		}
             
-            
-            
-            
             generation++;
-            
             
             //Ask if program should continue after final generation
             if(generation==maxGeneration){
@@ -273,8 +243,6 @@ class EvoRegress {
 	            	reader.close();
 	            }
             }            
-            
-            
         }
 
         //Get final generation data ready for output
@@ -301,8 +269,6 @@ class EvoRegress {
         	}
         }
 
-        
-        
 		//Finally, run the regression on the full available dataset for the largest phenotype
 			//Then output the coefficients for each variable in a file
 		//Start by finding the index of the largest phenotype
@@ -316,6 +282,7 @@ class EvoRegress {
 		}
 		//Now run the regression and get the coefficients for the phenotype
 		double finalCoeffs[] = genePool[maxIndex].train(env);
+		System.out.println(genePool[maxIndex].score(env));
 
 		//Output the results to a csv
         fileWriter = null;
@@ -324,13 +291,22 @@ class EvoRegress {
 			fileWriter = new FileWriter(regResultsPath);
 
 			//Write the CSV file header
-			fileWriter.append(Arrays.toString(env.getLabels()));
+			fileWriter.append("Intercept");	
+			String[] labels = env.getLabels();
+			for(i=0; i<labels.length; i++){
+				fileWriter.append(",");
+				fileWriter.append(labels[i]);
+			}
 			
 			//Add a new line separator after the header
 			fileWriter.append("\n");
 			
 			//Write coeffs to the CSV file
-			fileWriter.append(Arrays.toString(finalCoeffs));
+			fileWriter.append(String.valueOf(finalCoeffs[0]));	
+			for(i=1; i<finalCoeffs.length; i++){
+				fileWriter.append(",");
+				fileWriter.append(String.valueOf(finalCoeffs[i]));	
+			}
 		
 			System.out.println("CSV file was created successfully !!!");
 			
@@ -338,7 +314,6 @@ class EvoRegress {
 			System.out.println("Error in CsvFileWriter !!!");
 			e.printStackTrace();
 		} finally {
-			
 			try {
 				fileWriter.flush();
 				fileWriter.close();
@@ -346,11 +321,8 @@ class EvoRegress {
 				System.out.println("Error while flushing/closing fileWriter !!!");
                 e.printStackTrace();
 			}
-			
 		}
 		
     }
-
-
 }
 

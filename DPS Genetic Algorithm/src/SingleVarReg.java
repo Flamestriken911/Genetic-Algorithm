@@ -8,11 +8,13 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 class SingleVarReg {
 
-static String objectiveVar = "NP";
-static String dataFile     = 
-	"math_test_file.csv";
-static String outFile      = 
-	"math_test_file_output.csv";
+//static String objectiveVar = "NP";
+static String objectiveVar = "retention";
+//static String dataFile = ".\\Student-Teacher Data\\M ready HSonly ssprev npprev inc - Small - Useable - No SS.csv";
+static String dataFile = ".\\Teacher-School Data\\data_teachers_run mod.csv";
+//static String outFile = "math_test_file_output.csv";
+static String outFile = "teacher-school single var.csv";
+
 
 static boolean hasLabels   = true;
 
