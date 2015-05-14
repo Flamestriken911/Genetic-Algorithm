@@ -171,7 +171,6 @@ public int getNumVars() {
         return coeffsArray;
     }
 
-    //Find the adjusted r-squared value of the model with its current coefficients on a dataset
     public double score(Environment env){
         //Get the y[] and x[][] data from the environment
         double[] Y = env.getObjData();

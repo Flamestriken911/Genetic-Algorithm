@@ -36,7 +36,7 @@ class EvoRegress {
        
             //Control variables for main while function
         boolean fratricide = true;                              //Whether chance for one to mutate when identical phenotypes fight
-        int maxGeneration = 50;                               //The algorithm stops after this many generations
+        int maxGeneration = 1000;                               //The algorithm stops after this many generations
         double trainingProportion = 0.30;                       //This is the proportion of the data used to 'train' generations
         double battleProportion = 0.30;                         //This is the proportion of the data used to 'score' each phenotype
         int numPhenotypes = 1000;                               //Size of the population. Must be an even number
@@ -104,7 +104,7 @@ class EvoRegress {
             //Run until max iterations
         int generation = 0;
         while (generation < maxGeneration) {
-            System.out.println("Generation "+generation);   //Print the current generation to console
+            System.out.println("Generation "+generation+1);   //Print the current generation to console
 
             //Create training environment
             Environment trainEnv = new Environment();
@@ -319,7 +319,7 @@ class EvoRegress {
 				fileWriter.append(String.valueOf(finalCoeffs[i]));	
 			}
 			//Add two new line separators and the r-squared value
-			fileWriter.append("\n\nR-squared: "+String.valueOf(r_squared));
+			fileWriter.append("\n\nR-squared: "+String.valueOf(r_squared);
 		
 			System.out.println("CSV file was created successfully !!!");
 			

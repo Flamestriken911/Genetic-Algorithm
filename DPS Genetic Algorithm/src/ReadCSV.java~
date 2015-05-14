@@ -88,7 +88,6 @@ public class ReadCSV {
 	  return labels;
   };
   
-
   //Method to find the number of rows and columns in a csv file
   public int[] getNumRowsCols(String csvFile) {
 

@@ -1,225 +1,227 @@
-//Class for the 'environments' the phenotypes will be trained and tested on
+//class for the 'environments' (subsets of data) on which the phenotypes will be trained and tested
 
-class Environment {
+class environment {
 
-    //Initialize variables
-        //Reference to dataset to draw upon 
-    public double[][] dataSet;
-    private String[] labels;
-    private int keptRows;
-    private String objective;   
-    private double[] objData;
-    private double keepProportion=1;
+    //initialize variables
+    public double[][] dataset;          //the raw data
+    private string[] labels;            //names of the variables in the data
+    private int keptrows;               //number of rows kept when subsetting data
+    private string objective;           //name of the dependent variable
+    private double[] objdata;           //data column of the dependent variable
+    private double keepproportion=1;    //proportion of the data to keep when subsetting data
 
 
-    //Method to fill the environment with a new sample of some dataset
-    	//'proportion' is the approximate proportion of dataset to keep
-    public void getNewSample(double[][] data, double proportion) {
-       	this.keepProportion = proportion;
-    	//If the proportion is 1, then dataSet is the full array provided
-    	if (this.keepProportion==1.0){
-    		this.dataSet = data;
-    		this.keptRows = data.length;
+    //method to fill the environment with a new sample of some dataset
+    public void getnewsample(double[][] data, double proportion) {
+       	this.keepproportion = proportion;
+    	//if the proportion is 1, then dataset is the full array provided
+    	if (this.keepproportion==1.0){
+    		this.dataset = data;
+    		this.keptrows = data.length;
     	}
-    	//If proportion <1, then only keep a random subset of that dataset
+    	//if proportion is less than 1, then only keep a random subset of that dataset
     	else {
-	    	//Make array of booleans to decide which rows to keep
-	    	int dataRows = data.length;
-	    		//Track exact number of the remaining rows
-	    	this.keptRows = 0;
-	    	boolean[] keepList = new boolean[dataRows];
-	    	for (int i=0; i<dataRows; i++) {
-	    		keepList[i] = (false);
-	    		if(Math.random() < this.keepProportion) {
-	        		keepList[i] = (true);
-	        		this.keptRows++;
+	    	//make array of booleans to decide which rows to keep
+	    	int datarows = data.length;
+	    		//track exact number of rows kept
+	    	this.keptrows = 0;
+	    	boolean[] keeplist = new boolean[datarows];
+	    	for (int i=0; i<datarows; i++) {
+	    		keeplist[i] = (false);
+	    		if(math.random() < this.keepproportion) {
+	        		keeplist[i] = (true);
+	        		this.keptrows++;
 	    		}
 	    	}
-	    	//Put kept rows into the dataSet property
-	    	this.dataSet = new double[keptRows][data[0].length];
-	    	int dataSetRow = 0;
-	    	for (int i=0; i<dataRows; i++){
-	    		if (keepList[i]){
-	    			this.dataSet[dataSetRow] = data[i];
-	    			dataSetRow++;
+	    	//put kept rows into the dataset property
+	    	this.dataset = new double[keptrows][data[0].length];
+	    	int datasetrow = 0;
+	    	for (int i=0; i<datarows; i++){
+	    		if (keeplist[i]){
+	    			this.dataset[datasetrow] = data[i];
+	    			datasetrow++;
 	    		}
 	    	}
     	}
     }
-  //Method to fill the environment with a new sample of some dataset, with objective variable column and labels
+
+
+  //method to fill the environment with a new sample of some dataset, with objective variable column and labels
   //'proportion' is the approximate proportion of dataset to keep
-  public void getNewSample(double[][] data, double[] objectiveData, String[] labels, double proportion) {
-  	//If the proportion is 1, then dataSet is the full array provided
+  public void getnewsample(double[][] data, double[] objectivedata, string[] labels, double proportion) {
+  	//if the proportion is 1, then dataset is the full array provided
   if (proportion==1.0){
-  	this.dataSet = data;
-  	this.objData = objectiveData;
+  	this.dataset = data;
+  	this.objdata = objectivedata;
   	this.labels = labels;
-  	this.keptRows = data.length;
+  	this.keptrows = data.length;
   }
-  //If proportion <1, then only keep a random subset of that dataset
+  //if proportion <1, then only keep a random subset of that dataset
   else {
-  	//Make array of booleans to decide which rows to keep
-  	int dataRows = data.length;
-  		//Track exact number of the remaining rows
-  	this.keptRows = 0;
-  	boolean[] keepList = new boolean[dataRows];
-  	for (int i=0; i<dataRows; i++) {
-  		keepList[i] = (false);
-  		if(Math.random() < proportion) {
-      		keepList[i] = (true);
-      		this.keptRows++;
+  	//make array of booleans to decide which rows to keep
+  	int datarows = data.length;
+  		//track exact number of the remaining rows
+  	this.keptrows = 0;
+  	boolean[] keeplist = new boolean[datarows];
+  	for (int i=0; i<datarows; i++) {
+  		keeplist[i] = (false);
+  		if(math.random() < proportion) {
+      		keeplist[i] = (true);
+      		this.keptrows++;
   		}
   	}
-  	//Put kept rows into the dataSet and objData properties
-  	this.dataSet = new double[keptRows][data[0].length];
-  	this.objData = new double[keptRows];
-  	int dataSetRow = 0;
-  	for (int i=0; i<dataRows; i++){
-  		if (keepList[i]){
-  			this.dataSet[dataSetRow] = data[i];
-  			this.objData[dataSetRow] = objectiveData[i];
-  			dataSetRow++;
+  	//put kept rows into the dataset and objdata properties
+  	this.dataset = new double[keptrows][data[0].length];
+  	this.objdata = new double[keptrows];
+  	int datasetrow = 0;
+  	for (int i=0; i<datarows; i++){
+  		if (keeplist[i]){
+  			this.dataset[datasetrow] = data[i];
+  			this.objdata[datasetrow] = objectivedata[i];
+  			datasetrow++;
   		}
   	}
   }
   }
 
 
-    //Method to fill environment from a CSV
-    public void getFromCSV(String dataFile, boolean hasLabels){
-            //Create a new CSV reader to read in the data
-        ReadCSV reader = new ReadCSV(dataFile, hasLabels);
-            //Move the data into this environment
-        this.getNewSample(reader.getData(), 1.0);
-            //Keep array of labels for the columns if applicable
-        if (hasLabels){
-            this.setLabels(reader.getLabels());
+    //method to read in data from a csv file
+    public void getfromcsv(string datafile, boolean haslabels){
+            //create a new csv reader to read in the data
+        readcsv reader = new readcsv(datafile, haslabels);
+            //move the data into this environment
+        this.getnewsample(reader.getdata(), 1.0);
+            //keep array of labels for the columns if applicable
+        if (haslabels){
+            this.setlabels(reader.getlabels());
         }
     }
     
 
-    //Method returning the 'dataSet' property
-    public double[][] getDataSet() {
-    	return this.dataSet;
+    //method returning the raw data stored in the environment
+    public double[][] getdataset() {
+    	return this.dataset;
     }
-    //Method to return the number of kept rows
-    public int getNumRows(){
-        return this.keptRows;
-    }
-
-
-    //Method to set the name of the objective variable
-    public void setObjVar(String newObjVar){
-        this.objective = newObjVar;
+    //method to return the number of kept rows
+    public int getnumrows(){
+        return this.keptrows;
     }
 
 
-    //Method to separate out the objective var from the other variables
-    public void separateObjVar(){
-        this.setObjData(this.getColByName(this.objective));
-        int objCol = this.findColByName(this.objective);
-        removeCol(objCol);    
+    //method to set the name of the objective variable
+    public void setobjvar(string newobjvar){
+        this.objective = newobjvar;
     }
 
 
-    //Method to get a column in a flat array
-    public double[] getColumn(int colNum){
-        double[] returnColumn = new double[this.dataSet.length];
-        for (int i=0; i<this.dataSet.length; i++){
-            returnColumn[i] = dataSet[i][colNum];
+    //method to separate out the objective var from the other variables
+    public void separateobjvar(){
+        this.setobjdata(this.getcolbyname(this.objective));
+        int objcol = this.findcolbyname(this.objective);
+        removecol(objcol);    
+    }
+
+
+    //method to get a column in a flat array
+    public double[] getcolumn(int colnum){
+        double[] returncolumn = new double[this.dataset.length];
+        for (int i=0; i<this.dataset.length; i++){
+            returncolumn[i] = dataset[i][colnum];
         }
-        return returnColumn;
+        return returncolumn;
     }
     
 
-    //Find the column number for the variable named in the function argument
-    public int findColByName(String varName){
+    //method to find the column number for the variable named in the function argument
+    public int findcolbyname(string varname){
         int i;
     	for (i=0; i<labels.length; i++){
-            if(varName.equals(labels[i])) break;
+            if(varname.equals(labels[i])) break;
         }
         return i;
     }
 
 
-    //Method to get flat column for named variable
-    public double[] getColByName(String colName){
-        return this.getColumn(this.findColByName(colName));
+    //method to get flat column for named variable
+    public double[] getcolbyname(string colname){
+        return this.getcolumn(this.findcolbyname(colname));
     }
 
     
-    //Method to remove a column and its label
-    public String removeCol(int col){
-    	String removedLabel = this.labels[col];
-    	double[][] newdata = new double[this.dataSet.length][this.dataSet[0].length-1];
-    	String[] newlabels = new String[this.labels.length-1];
-    	int currentCol=0;
-    	for (int i=0;i<this.dataSet[0].length;i++){
+    //method to remove a column and its label from dataset entirely
+    public string removecol(int col){
+    	string removedlabel = this.labels[col];
+    	double[][] newdata = new double[this.dataset.length][this.dataset[0].length-1];
+    	string[] newlabels = new string[this.labels.length-1];
+    	int currentcol=0;
+    	for (int i=0;i<this.dataset[0].length;i++){
     		if(i!=col)	{
-    			for (int j=0;j<this.dataSet.length;j++){
-    					newdata[j][currentCol] = this.dataSet[j][i];
+    			for (int j=0;j<this.dataset.length;j++){
+    					newdata[j][currentcol] = this.dataset[j][i];
     			}
-    			newlabels[currentCol] = this.labels[i];
-    			currentCol++;
+    			newlabels[currentcol] = this.labels[i];
+    			currentcol++;
     		}
     	}
-    	this.dataSet = newdata;
+    	this.dataset = newdata;
     	this.labels = newlabels;
-    	return removedLabel;
+    	return removedlabel;
     }
     
     
-    //Function to find probability of all 0s or all 1s in a data row
-    	//Will return -1 if column is non-binary
-    public double calcFailRate(int col, double keepRate){
-    	double[] colToCheck = this.getColumn(col);
-    	int rows = colToCheck.length;
-    	double failRate = -1;
+    //function to find probability of all 0s or all 1s in a data row
+    	//will return -1 if column is non-binary
+    public double calcfailrate(int col, double keeprate){
+    	double[] coltocheck = this.getcolumn(col);
+    	int rows = coltocheck.length;
+    	double failrate = -1;
     	int num1s = 0;
     	int num0s = 0;
     	for (int i=0; i<rows; i++){
-    		if(colToCheck[i]==0) num0s++;
-    		else if(colToCheck[i]==1) num1s++;
+    		if(coltocheck[i]==0) num0s++;
+    		else if(coltocheck[i]==1) num1s++;
     		else return -1;
     	}
-    	double probAll0 = (double) num0s / rows;
-    	double probAll1 = (double) num1s / rows;
-    	failRate = Math.pow(probAll0, Math.ceil(rows*keepRate)) + Math.pow(probAll1, Math.ceil(rows*keepRate));
-    	return failRate;
+    	double proball0 = (double) num0s / rows;
+    	double proball1 = (double) num1s / rows;
+    	failrate = math.pow(proball0, math.ceil(rows*keeprate)) + math.pow(proball1, math.ceil(rows*keeprate));
+    	return failrate;
     }
     
-    //Function to remove columns if they are more likely to fail than a given threshold
-    String[] useFailureThreshold(double keepRate, double threshold){
-    	String[] removedList = new String[this.labels.length];
-    	int numRemoved = 0;
+    //function to remove columns if they are more likely to have all the same value than a given threshold
+    string[] usefailurethreshold(double keeprate, double threshold){
+    	string[] removedlist = new string[this.labels.length];
+    	int numremoved = 0;
     	int i = this.labels.length-1;
     	while (i>=0){
-    		double failrate = this.calcFailRate(i, keepRate);
+    		double failrate = this.calcfailrate(i, keeprate);
     		if(failrate > threshold){
-    			removedList[numRemoved] = this.removeCol(i) + " : " + failrate;
-    			numRemoved++;
+    			removedlist[numremoved] = this.removecol(i) + " : " + failrate;
+    			numremoved++;
     		}
     		i--;
     	}
-    	return removedList;
+    	return removedlist;
     }
     
 
-    //Methods to set and get the labels property of the environment
-    public void setLabels(String[] newLabels){
-        this.labels = newLabels;
+    //methods to set and get variable names
+    public void setlabels(string[] newlabels){
+        this.labels = newlabels;
     }
-    public String[] getLabels(){
+    public string[] getlabels(){
         return this.labels;
     }
 
-
+    //Methods to set and get dependent variable data
 	public double[] getObjData() {
 		return objData;
 	}
 	public void setObjData(double[] objData) {
 		this.objData = objData;
 	}
+
+    //Methods to set and get the name of the dependent variable
 	public String getObjective() {
 		return this.objective;
 	}
